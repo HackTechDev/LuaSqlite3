@@ -11,69 +11,40 @@ databaseName = "mt_gandi.sqlite3"
 function initDatabase()
     local db = sqlite3.open(databaseName)
     db:exec[[
-      CREATE TABLE user (id INTEGER PRIMARY KEY AUTOINCREMENT,  
-                         firstname CHAR(32),
-                         lastname CHAR(32),
-                         nickname CHAR(32)
+      CREATE TABLE server (id INTEGER PRIMARY KEY AUTOINCREMENT,  
+                         hostname CHAR(32),
+                         ipv4name CHAR(32),
+                         ipv6 CHAR(32)
                         );
-      CREATE TABLE server (id INTEGER PRIMARY KEY,
-                           hostname CHAR(32),
-                           ipv4 CHAR(32),
-                           ipv6 CHAR(32),
-			   posx INTEGER,
-			   posy INTEGER,
-			   posz INTEGER
+
     ]]
     db:close()
 end
 
+
 -- Lua CRUD method
-
-
-function insertServer(id, hostname, ipv4, ipv6, posx, posy, posz)
+function insertServer(hostname, ipv4name, ipv6)
     local db = sqlite3.open(databaseName)
-    local stmt = db:prepare[[ INSERT INTO server VALUES (:id, :hostname, :ipv4, :ipv6, :posx, :posy, :posz) ]]
-    stmt:bind_names{  id = id,  hostname = hostname, ipv4 = ipv4, ipv6 = ipv6, posx = posx, posy = posy, posz = posz }
+    local stmt = db:prepare[[ INSERT INTO server VALUES (null, :hostname, :ipv4name, :ipv6) ]]
+    stmt:bind_names{ hostname = hostname, ipv4name = ipv4name, ipv6 = ipv6  }
     stmt:step()
     stmt:finalize()
     db:close()
 end
-
-
 
 function selectServer()
     local db = sqlite3.open(databaseName)
     for row in db:nrows("SELECT * FROM server") do
-      print(row.id, row.hostname, row.ipv4)
-      end 
-    db:close()
-
-end
-
-
--- Lua CRUD method
-function insertUser(firstname, lastname, nickname)
-    local db = sqlite3.open(databaseName)
-    local stmt = db:prepare[[ INSERT INTO user VALUES (null, :firstname, :lastname, :nickname) ]]
-    stmt:bind_names{ firstname = firstname, lastname = lastname, nickname = nickname  }
-    stmt:step()
-    stmt:finalize()
-    db:close()
-end
-
-function selectUser()
-    local db = sqlite3.open(databaseName)
-    for row in db:nrows("SELECT * FROM user") do
-      print(row.id, row.firstname, row.lastname, row.nickname)
-      end 
+      print(row.id, row.hostname, row.ipv4name, row.ipv6)
+    end 
     db:close()
 end
 
 
-function updateUser(id, field, value)
+function updateServer(id, field, value)
     local db = sqlite3.open(databaseName)
-    if field == "nickname" then
-        local stmt = db:prepare[[ UPDATE user SET  nickname = :value WHERE id = :id ]]
+    if field == "ipv6" then
+        local stmt = db:prepare[[ UPDATE server SET  ipv6 = :value WHERE id = :id ]]
         stmt:bind_names{  id = id,  value = value  }
         stmt:step()
         stmt:finalize()
@@ -82,9 +53,9 @@ function updateUser(id, field, value)
 end
 
 
-function deleteUser(id)
+function deleteServer(id)
     local db = sqlite3.open(databaseName)
-    local stmt = db:prepare[[ DELETE FROM user WHERE id = :id ]]
+    local stmt = db:prepare[[ DELETE FROM server WHERE id = :id ]]
     stmt:bind_names{  id = id }
     stmt:step()
     stmt:finalize()
@@ -100,34 +71,27 @@ end
 initDatabase()
 
 
--- Insert data
-insertUser("Solomon", "Kane", "Nekrofage")
-insertUser("Samuel", "Gondouin", "LeSanglier")
-insertUser("Black", "Metal", "Nekros")
+insertServer("Solomon", "Kane", "Nekrofage")
+insertServer("Samuel", "Gondouin", "LeSanglier")
+insertServer("Black", "Metal", "Nekros")
 
 seperator()
 
--- Select user
-selectUser()
+selectServer()
+seperator()
+
+updateServer(2, "ipv6", "Samglux")
 
 seperator()
 
--- Update User
-updateUser(2, "nickname", "Samglux")
+selectServer()
 
 seperator()
 
--- Select user
-selectUser()
+deleteServer(3)
 
 seperator()
 
--- Delete user
-deleteUser(3)
-
-seperator()
-
--- Select user
-selectUser()
+selectServer()
 
 seperator()
