@@ -11,7 +11,7 @@ databaseName = "mt_gandi.sqlite3"
 function initDatabase()
     local db = sqlite3.open(databaseName)
     db:exec[[
-      CREATE TABLE user (id INTEGER PRIMARY KEY, 
+      CREATE TABLE user (id INTEGER PRIMARY KEY AUTOINCREMENT,  
                          firstname CHAR(32),
                          lastname CHAR(32),
                          nickname CHAR(32)
@@ -52,10 +52,10 @@ end
 
 
 -- Lua CRUD method
-function insertUser(id, firstname, lastname, nickname)
+function insertUser(firstname, lastname, nickname)
     local db = sqlite3.open(databaseName)
-    local stmt = db:prepare[[ INSERT INTO user VALUES (:id, :firstname, :lastname, :nickname) ]]
-    stmt:bind_names{  id = id,  firstname = firstname, lastname = lastname, nickname = nickname  }
+    local stmt = db:prepare[[ INSERT INTO user VALUES (null, :firstname, :lastname, :nickname) ]]
+    stmt:bind_names{ firstname = firstname, lastname = lastname, nickname = nickname  }
     stmt:step()
     stmt:finalize()
     db:close()
@@ -101,9 +101,9 @@ initDatabase()
 
 
 -- Insert data
-insertUser(1, "Solomon", "Kane", "Nekrofage")
-insertUser(2, "Samuel", "Gondouin", "LeSanglier")
-insertUser(3, "Black", "Metal", "Nekros")
+insertUser("Solomon", "Kane", "Nekrofage")
+insertUser("Samuel", "Gondouin", "LeSanglier")
+insertUser("Black", "Metal", "Nekros")
 
 seperator()
 
