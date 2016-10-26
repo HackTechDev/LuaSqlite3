@@ -17,11 +17,37 @@ function initDatabase()
                          nickname CHAR(32)
                         );
       CREATE TABLE server (id INTEGER PRIMARY KEY,
-                           name CHAR(32),
+                           hostname CHAR(32),
                            ipv4 CHAR(32),
-                           ipv6 CHAR(32)
+                           ipv6 CHAR(32),
+			   posx INTEGER,
+			   posy INTEGER,
+			   posz INTEGER
     ]]
     db:close()
+end
+
+-- Lua CRUD method
+
+
+function insertServer(id, hostname, ipv4, ipv6, posx, posy, posz)
+    local db = sqlite3.open(databaseName)
+    local stmt = db:prepare[[ INSERT INTO server VALUES (:id, :hostname, :ipv4, :ipv6, :posx, :posy, :posz) ]]
+    stmt:bind_names{  id = id,  hostname = hostname, ipv4 = ipv4, ipv6 = ipv6, posx = posx, posy = posy, posz = posz }
+    stmt:step()
+    stmt:finalize()
+    db:close()
+end
+
+
+
+function selectServer()
+    local db = sqlite3.open(databaseName)
+    for row in db:nrows("SELECT * FROM server") do
+      print(row.id, row.hostname, row.ipv4)
+      end 
+    db:close()
+
 end
 
 
